@@ -1,0 +1,113 @@
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_margin="8dp"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="12dp"
+    card_view:cardElevation="6dp"
+    card_view:cardBackgroundColor="@color/colorBackgroundCard">
+
+    <RelativeLayout
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Data în colțul dreapta sus -->
+        <TextView
+            android:id="@+id/maintenance_date"
+            android:textSize="16sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12.03.2024"
+            android:textColor="#ECEFCA"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true" />
+
+        <!-- Titlu sub data -->
+        <TextView
+            android:id="@+id/maintenance_title"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Titlu întreținere"
+            android:textColor="#FFFFFF"
+            android:layout_below="@id/maintenance_date"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Descriere -->
+        <TextView
+            android:id="@+id/maintenance_description"
+            android:textSize="16sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Descriere întreținere"
+            android:textColor="#ECEFCA"
+            android:layout_below="@id/maintenance_title"
+            android:layout_marginTop="4dp"/>
+
+        <!-- Grup text stânga -->
+        <LinearLayout
+            android:id="@+id/text_group"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/maintenance_description"
+            android:layout_marginTop="8dp"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/buttons_layout">
+
+            <TextView
+                android:id="@+id/maintenance_mileage"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Odometru: 120000 km"
+                android:textColor="#ECEFCA"/>
+
+            <TextView
+                android:id="@+id/maintenance_cost"
+                android:textSize="16sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cost: 350 RON"
+                android:textColor="#ECEFCA"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <!-- Butoane colț dreapta -->
+        <LinearLayout
+            android:id="@+id/buttons_layout"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/maintenance_description"
+            android:layout_marginStart="16dp"
+            android:gravity="end">
+
+            <ImageButton
+                android:id="@+id/btn_edit"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/edit"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Edit"
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                card_view:tint="#ECEFCA"/>
+
+            <ImageButton
+                android:id="@+id/btn_delete"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/delete"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Delete"
+                android:scaleType="centerInside"
+                android:padding="6dp"
+                android:layout_marginTop="4dp"
+                card_view:tint="#ECEFCA"/>
+        </LinearLayout>
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

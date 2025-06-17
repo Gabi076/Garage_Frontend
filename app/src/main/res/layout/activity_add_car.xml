@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:fitsSystemWindows="true">
+
+    <EditText
+        android:id="@+id/input_make"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Marca" />
+
+    <EditText
+        android:id="@+id/input_model"
+        app:layout_constraintTop_toBottomOf="@+id/input_make"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Model" />
+
+    <EditText
+        android:id="@+id/input_year"
+        app:layout_constraintTop_toBottomOf="@+id/input_model"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="An" />
+
+    <Button
+        android:id="@+id/search_button"
+        app:layout_constraintTop_toBottomOf="@+id/input_year"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Caută" />
+
+    <TextView
+        android:id="@+id/no_results_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nu s-a gasit nicio mașină."
+        android:textSize="18sp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_results"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
