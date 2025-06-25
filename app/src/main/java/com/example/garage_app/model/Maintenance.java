@@ -5,14 +5,14 @@ import java.time.LocalDate;
 
 public class Maintenance implements Serializable {
     private Long id;
-    private String title;
+    private MaintenanceType title;
     private String description;
     private LocalDate date;
     private Double cost;
     private Integer mileage;
     private Long carId;
 
-    public Maintenance(Long id, String title, String description, LocalDate date, Double cost, Integer mileage, Long carId) {
+    public Maintenance(Long id, MaintenanceType title, String description, LocalDate date, Double cost, Integer mileage, Long carId) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -42,11 +42,11 @@ public class Maintenance implements Serializable {
         this.date = date;
     }
 
-    public String getTitle() {
+    public MaintenanceType getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(MaintenanceType title) {
         this.title = title;
     }
 

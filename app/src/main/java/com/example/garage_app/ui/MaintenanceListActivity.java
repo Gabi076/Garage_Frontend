@@ -5,12 +5,21 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,13 +27,16 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.garage_app.R;
 import com.example.garage_app.adapter.MaintenanceAdapter;
 import com.example.garage_app.model.Maintenance;
+import com.example.garage_app.model.MaintenanceType;
 import com.example.garage_app.repository.MaintenanceRepository;
+import com.google.android.material.button.MaterialButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -45,8 +57,11 @@ import retrofit2.Response;
 
 public class MaintenanceListActivity extends AppCompatActivity {
     private List<Maintenance> maintenanceList = new ArrayList<>();
+    private List<Maintenance> allMaintenances = new ArrayList<>();
     private MaintenanceAdapter adapter;
     private long carId;
+    private static final int ANIMATION_DURATION = 300;
+    private boolean isExtraMenuVisible = false;
 
     private static final int STORAGE_PERMISSION_CODE = 100;
     private static final int IMPORT_REQUEST_CODE = 101;
@@ -76,6 +91,8 @@ public class MaintenanceListActivity extends AppCompatActivity {
 
         carId = getIntent().getLongExtra("carId", -1);
         RecyclerView recyclerView = findViewById(R.id.maintenance_recycler);
+        View extraButtons = findViewById(R.id.extra_buttons_container);
+
         adapter = new MaintenanceAdapter(maintenanceList, this, new MaintenanceAdapter.OnMaintenanceActionListener() {
             @Override
             public void onEdit(Maintenance m) {
@@ -96,6 +113,7 @@ public class MaintenanceListActivity extends AppCompatActivity {
                                 public void onResponse(Call<Void> call, Response<Void> response) {
                                     if (response.isSuccessful()) {
                                         maintenanceList.remove(m);
+                                        allMaintenances.remove(m);
                                         adapter.notifyDataSetChanged();
                                         Toast.makeText(MaintenanceListActivity.this, "Șters cu succes", Toast.LENGTH_SHORT).show();
                                     } else {
@@ -119,18 +137,27 @@ public class MaintenanceListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
+        setupFilterButtons();
+
         findViewById(R.id.btn_add_maintenance).setOnClickListener(v -> {
             Intent intent = new Intent(this, AddMaintenanceActivity.class);
             intent.putExtra("carId", carId);
             startActivity(intent);
         });
+        findViewById(R.id.btn_toggle_menu).setOnClickListener(v -> toggleExtraMenu());
+        findViewById(R.id.menu_overlay).setOnClickListener(v -> toggleExtraMenu());
 
         findViewById(R.id.btn_export_csv).setOnClickListener(v -> exportMaintenances());
         findViewById(R.id.btn_import_csv).setOnClickListener(v -> importMaintenances());
+        findViewById(R.id.btn_stats).setOnClickListener(v -> {
+            toggleExtraMenu();
+            Intent intent = new Intent(this, MaintenanceStatsActivity.class);
+            intent.putExtra("carId", carId);
+            startActivity(intent);
+        });
 
         loadMaintenances();
     }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -142,10 +169,17 @@ public class MaintenanceListActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Maintenance>> call, Response<List<Maintenance>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    allMaintenances.clear();
+                    allMaintenances.addAll(response.body());
                     maintenanceList.clear();
-                    maintenanceList.addAll(response.body());
+                    maintenanceList.addAll(allMaintenances);
                     adapter.sortMaintenancesByDate();
                     adapter.notifyDataSetChanged();
+                }
+                if (allMaintenances.isEmpty()) {
+                    findViewById(R.id.no_maintenances_text).setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.no_maintenances_text).setVisibility(View.GONE);
                 }
             }
 
@@ -156,7 +190,132 @@ public class MaintenanceListActivity extends AppCompatActivity {
         });
     }
 
+    private void setupFilterButtons() {
+        LinearLayout container = findViewById(R.id.type_filter_container);
+        container.removeAllViews();
+
+        String[] types = new String[]{"Toate", "Ulei", "Revizie", "Anvelope", "Piese", "Altele"};
+        int buttonPadding = getResources().getDimensionPixelSize(R.dimen.filter_button_padding);
+        int minButtonWidth = getResources().getDimensionPixelSize(R.dimen.filter_button_min_width);
+
+        for (String type : types) {
+            MaterialButton button = new MaterialButton(this, null);
+
+            button.setText(type);
+            button.setAllCaps(false);
+            button.setCornerRadius(getResources().getDimensionPixelSize(R.dimen.filter_button_corner_radius));
+            button.setStrokeWidth(getResources().getDimensionPixelSize(R.dimen.filter_button_stroke_width));
+            button.setStrokeColor(ContextCompat.getColorStateList(this, R.color.colorSecondary));
+            button.setTextColor(ContextCompat.getColor(this, R.color.colorOnSurface));
+            button.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    getResources().getDimensionPixelSize(R.dimen.filter_button_text_size));
+
+            // Make buttons more touch-friendly
+            button.setPadding(buttonPadding, buttonPadding, buttonPadding, buttonPadding);
+            button.setMinWidth(minButtonWidth);
+            button.setMinHeight(getResources().getDimensionPixelSize(R.dimen.filter_button_min_height));
+
+            // Add ripple effect
+            button.setRippleColor(ContextCompat.getColorStateList(this, R.color.colorSecondaryLight));
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    getResources().getDimensionPixelSize(R.dimen.filter_button_height)
+            );
+            params.setMargins(
+                    getResources().getDimensionPixelSize(R.dimen.filter_button_margin_horizontal),
+                    getResources().getDimensionPixelSize(R.dimen.filter_button_margin_vertical),
+                    getResources().getDimensionPixelSize(R.dimen.filter_button_margin_horizontal),
+                    getResources().getDimensionPixelSize(R.dimen.filter_button_margin_vertical)
+            );
+            button.setLayoutParams(params);
+
+            button.setOnClickListener(v -> {
+                filterMaintenances(type);
+                highlightSelectedButton(container, v);
+            });
+
+            container.addView(button);
+
+            if (type.equals("Toate")) {
+                button.post(() -> {
+                    button.performClick();
+                    button.setBackgroundColor(ContextCompat.getColor(this, R.color.colorSecondary));
+                    button.setTextColor(ContextCompat.getColor(this, R.color.colorOnSecondary));
+                    button.setStrokeColor(ColorStateList.valueOf(
+                            ContextCompat.getColor(this, R.color.colorSecondary)));
+                });
+            }
+        }
+    }
+    private void highlightSelectedButton(LinearLayout container, View selected) {
+        for (int i = 0; i < container.getChildCount(); i++) {
+            View child = container.getChildAt(i);
+            if (child instanceof MaterialButton) {
+                MaterialButton button = (MaterialButton) child;
+                button.setBackgroundColor(Color.TRANSPARENT);
+                button.setTextColor(getResources().getColor(R.color.colorTextCardPrimary));
+                button.setStrokeColor(ColorStateList.valueOf(getResources().getColor(R.color.colorSecondary)));
+            }
+        }
+
+        if (selected instanceof MaterialButton) {
+            MaterialButton selectedButton = (MaterialButton) selected;
+            selectedButton.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+            selectedButton.setTextColor(getResources().getColor(R.color.colorOnSecondary));
+            selectedButton.setStrokeColor(ColorStateList.valueOf(getResources().getColor(R.color.colorSecondary)));
+        }
+    }
+    private void filterMaintenances(String type) {
+        List<Maintenance> filtered = new ArrayList<>();
+        if (type.equals("Toate")) {
+            filtered.addAll(allMaintenances);
+        } else {
+            MaintenanceType selectedType = MaintenanceType.valueOf(type.toUpperCase());
+            for (Maintenance m : allMaintenances) {
+                if (m.getTitle() == selectedType) {
+                    filtered.add(m);
+                }
+            }
+        }
+        if (filtered.isEmpty()) {
+            findViewById(R.id.no_maintenances_text).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.no_maintenances_text).setVisibility(View.GONE);
+        }
+        adapter.updateList(filtered);
+    }
+    private void toggleExtraMenu() {
+        View overlay = findViewById(R.id.menu_overlay);
+        View menu = findViewById(R.id.extra_buttons_container);
+
+        if (menu.getVisibility() == View.VISIBLE) {
+            // Hide menu with animation
+            menu.animate()
+                    .translationY(100)
+                    .alpha(0)
+                    .setDuration(200)
+                    .withEndAction(() -> {
+                        menu.setVisibility(View.INVISIBLE);
+                        overlay.setVisibility(View.INVISIBLE);
+                    })
+                    .start();
+        } else {
+            // Show menu with animation
+            overlay.setVisibility(View.VISIBLE);
+            menu.setVisibility(View.VISIBLE);
+            menu.setAlpha(0);
+            menu.setTranslationY(100);
+            menu.animate()
+                    .translationY(0)
+                    .alpha(1)
+                    .setDuration(200)
+                    .start();
+        }
+    }
+
     private void exportMaintenances() {
+        toggleExtraMenu();
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             checkStoragePermission();
         }
@@ -233,6 +392,7 @@ public class MaintenanceListActivity extends AppCompatActivity {
     }
 
     private void importMaintenances() {
+        toggleExtraMenu();
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("application/json");

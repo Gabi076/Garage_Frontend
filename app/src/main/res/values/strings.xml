@@ -1,6 +1,18 @@
 <resources>
-    <string name="app_name">A</string>
-    <string name="profile_picture">Profile Picture</string>
-    <string name="change_password">Change Password</string>
-    <string name="sync_now">Sync Now</string>"
+    <string name="app_name">CrankOn</string>
+    <string name="profile_picture">Imagine Profil</string>
+    <string name="change_password">Schimbă Parola</string>
+    <string name="sync_now">Sincronizează</string>
+    <string name="logout">Deconectare</string>
+    <string name="no_cars_found">Nicio mașină în garaj</string>
+    <string name="no_connection">Nu s-a putut conecta la server!</string>
+    <string name="add_car">Adaugă mașină</string>
+    <string name="remove_car">Șterge mașina</string>
+    <string name="maintenance_text">Întreținere</string>
+
+    <string-array name="y_axis_options">
+        <item>Preț</item>
+        <item>Kilometri</item>
+    </string-array>
+
 </resources>

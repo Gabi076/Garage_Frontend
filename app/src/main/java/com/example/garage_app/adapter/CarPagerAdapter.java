@@ -53,11 +53,13 @@ public class CarPagerAdapter extends RecyclerView.Adapter<CarPagerAdapter.CarVie
         holder.engineType.setText(car.getEngineType());
         holder.cylinders.setText(car.getCylinders());
         holder.displacement.setText(String.format("%s cc", car.getDisplacement()));
+        holder.fuel.setText(car.getFuelType());
+        holder.doors.setText(car.getDoors());
 
         Glide.with(context)
-                .load("https://i.ibb.co/3ypmch1G/NoBgCar.png")
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .error(R.drawable.ic_launcher_foreground)
+                .load("https://i.ibb.co/JwVN05ng/car.png")
+                .placeholder(R.drawable.ic_image_placeholder)
+                .error(R.drawable.ic_image_placeholder)
                 .into(holder.carImage);
 
         holder.deleteBtn.setOnClickListener(v -> listener.onDelete(car));
@@ -71,7 +73,7 @@ public class CarPagerAdapter extends RecyclerView.Adapter<CarPagerAdapter.CarVie
 
     public static class CarViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
-        TextView makeModel, yearTrim, driveType, transmission, engineType, cylinders, displacement;
+        TextView makeModel, yearTrim, driveType, transmission, engineType, cylinders, displacement, fuel, doors;
         ImageView carImage;
         Button deleteBtn, maintenanceBtn;
 
@@ -85,6 +87,8 @@ public class CarPagerAdapter extends RecyclerView.Adapter<CarPagerAdapter.CarVie
             engineType = itemView.findViewById(R.id.engine_type);
             cylinders = itemView.findViewById(R.id.cylinders);
             displacement = itemView.findViewById(R.id.displacement);
+            fuel = itemView.findViewById(R.id.fuel_type);
+            doors = itemView.findViewById(R.id.doors);
             deleteBtn = itemView.findViewById(R.id.btn_delete_car);
             maintenanceBtn = itemView.findViewById(R.id.btn_maintenance);
             carImage = itemView.findViewById(R.id.car_image);

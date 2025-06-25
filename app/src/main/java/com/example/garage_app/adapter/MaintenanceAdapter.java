@@ -44,7 +44,7 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
     @Override
     public void onBindViewHolder(@NonNull MaintenanceViewHolder holder, int position) {
         Maintenance m = maintenances.get(position);
-        holder.title.setText(m.getTitle());
+        holder.title.setText(m.getTitle().toString());
         holder.description.setText(m.getDescription());
         holder.mileage.setText("Odometru: " + m.getMileage() + " km");
 
@@ -82,6 +82,13 @@ public class MaintenanceAdapter extends RecyclerView.Adapter<MaintenanceAdapter.
             maintenances.sort((m1, m2) -> m2.getDate().compareTo(m1.getDate()));
             notifyDataSetChanged();
         }
+    }
+
+    public void updateList(List<Maintenance> newList) {
+        this.maintenances.clear();
+        this.maintenances.addAll(newList);
+        sortMaintenancesByDate();
+        notifyDataSetChanged();
     }
 }
 

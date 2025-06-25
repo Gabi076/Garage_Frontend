@@ -2,7 +2,6 @@ package com.example.garage_app.ui;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +16,8 @@ import com.example.garage_app.util.CarApiService;
 import com.example.garage_app.model.Car;
 import com.example.garage_app.repository.CarRepository;
 import com.example.garage_app.repository.UserRepository;
+import com.example.garage_app.util.TranslationHelper;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -41,7 +42,7 @@ public class AddCarActivity extends AppCompatActivity {
         modelInput = findViewById(R.id.input_model);
         yearInput = findViewById(R.id.input_year);
         noResultsText = findViewById(R.id.no_results_text);
-        Button searchButton = findViewById(R.id.search_button);
+        MaterialButton searchButton = findViewById(R.id.search_button);
 
         recyclerView = findViewById(R.id.recycler_results);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -61,16 +62,31 @@ public class AddCarActivity extends AppCompatActivity {
                     recyclerView.setAdapter(new CarResultAdapter(results, car -> {
                         selectedCar = car;
                         selectedCar.setOwnerId(Long.valueOf(userId));
-                        CarRepository.addCar(selectedCar, new Callback<>() {
+
+                        TranslationHelper translator = new TranslationHelper();
+                        translator.translateCarFields(selectedCar, new TranslationHelper.CarTranslationCallback() {
                             @Override
-                            public void onResponse(Call<Void> call, Response<Void> response) {
-                                Toast.makeText(AddCarActivity.this, "Mașina a fost adăugată", Toast.LENGTH_SHORT).show();
-                                finish();
+                            public void onSuccess(Car translatedCar) {
+                                CarRepository.addCar(translatedCar, new Callback<>() {
+                                    @Override
+                                    public void onResponse(Call<Void> call, Response<Void> response) {
+                                        Toast.makeText(AddCarActivity.this, "Mașina a fost adăugată", Toast.LENGTH_SHORT).show();
+                                        translator.cleanup();
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Void> call, Throwable t) {
+                                        Toast.makeText(AddCarActivity.this, "Eroare la salvare", Toast.LENGTH_SHORT).show();
+                                        translator.cleanup();
+                                    }
+                                });
                             }
 
                             @Override
-                            public void onFailure(Call<Void> call, Throwable t) {
-                                Toast.makeText(AddCarActivity.this, "Eroare la salvare", Toast.LENGTH_SHORT).show();
+                            public void onFailure(Exception e) {
+                                Toast.makeText(AddCarActivity.this, "Eroare la traducere: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                translator.cleanup();
                             }
                         });
                     }));

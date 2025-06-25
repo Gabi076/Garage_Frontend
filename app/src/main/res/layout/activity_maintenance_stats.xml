@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/stats_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
+
+    <androidx.percentlayout.widget.PercentFrameLayout
+        android:id="@+id/y_axis_toggle"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_gravity="end"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/toggle_background"
+        android:padding="2dp">
+
+        <View
+            android:id="@+id/toggle_indicator"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_widthPercent="50%"
+            android:background="@drawable/toggle_indicator" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/toggle_price"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Preț"
+                android:textSize="14sp"
+                android:textColor="@color/white"/>
+
+            <TextView
+                android:id="@+id/toggle_km"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Km"
+                android:textSize="14sp"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+    </androidx.percentlayout.widget.PercentFrameLayout>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/maintenance_chart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1" />
+</LinearLayout>

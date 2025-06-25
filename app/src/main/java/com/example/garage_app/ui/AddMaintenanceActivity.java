@@ -2,6 +2,8 @@ package com.example.garage_app.ui;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -10,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.garage_app.R;
 import com.example.garage_app.model.Maintenance;
+import com.example.garage_app.model.MaintenanceType;
 import com.example.garage_app.repository.MaintenanceRepository;
 import com.google.android.material.button.MaterialButton;
 
@@ -24,7 +27,8 @@ import retrofit2.Response;
 
 public class AddMaintenanceActivity extends AppCompatActivity {
 
-    private EditText titleEditText, descriptionEditText, mileageEditText, costEditText, dateEditText;
+    private EditText descriptionEditText, mileageEditText, costEditText, dateEditText;
+    private AutoCompleteTextView titleAutoComplete;
     private MaterialButton saveButton;
     private Maintenance existingMaintenance;
     private LocalDate selectedDate = LocalDate.now();
@@ -36,7 +40,8 @@ public class AddMaintenanceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_maintenance);
 
-        titleEditText = findViewById(R.id.edit_maintenance_title);
+        titleAutoComplete = findViewById(R.id.spinner_maintenance_title);
+
         descriptionEditText = findViewById(R.id.edit_maintenance_description);
         mileageEditText = findViewById(R.id.edit_maintenance_mileage);
         costEditText = findViewById(R.id.edit_maintenance_cost);
@@ -45,8 +50,17 @@ public class AddMaintenanceActivity extends AppCompatActivity {
 
         existingMaintenance = (Maintenance) getIntent().getSerializableExtra("maintenance");
 
+        String[] types = {"Ulei", "Revizie", "Anvelope", "Piese", "Altele"};
+        ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, types);
+        titleAutoComplete.setAdapter(typeAdapter);
+        titleAutoComplete.setThreshold(1);
+
         if (existingMaintenance != null) {
-            titleEditText.setText(existingMaintenance.getTitle());
+            String existingTitle = existingMaintenance.getTitle().name();
+            titleAutoComplete.setText(existingTitle, false);
+            titleAutoComplete.setEnabled(false);
+
             descriptionEditText.setText(existingMaintenance.getDescription());
             mileageEditText.setText(String.valueOf(existingMaintenance.getMileage()));
             costEditText.setText(String.valueOf(existingMaintenance.getCost()));
@@ -74,7 +88,6 @@ public class AddMaintenanceActivity extends AppCompatActivity {
     }
 
     private void updateExistingMaintenance() {
-        existingMaintenance.setTitle(titleEditText.getText().toString());
         existingMaintenance.setDescription(descriptionEditText.getText().toString());
         existingMaintenance.setMileage(Integer.parseInt(mileageEditText.getText().toString()));
         existingMaintenance.setCost(Double.parseDouble(costEditText.getText().toString()));
@@ -99,13 +112,14 @@ public class AddMaintenanceActivity extends AppCompatActivity {
     }
 
     private void createNewMaintenance() {
-        String title = titleEditText.getText().toString();
+        String titleString = titleAutoComplete.getText().toString().toUpperCase(Locale.ROOT);
+        MaintenanceType title = MaintenanceType.valueOf(titleString);
         String description = descriptionEditText.getText().toString();
         String mileageText = mileageEditText.getText().toString();
         String costText = costEditText.getText().toString();
 
-        if (title.isEmpty() || costText.isEmpty()) {
-            Toast.makeText(this, "Completează titlul și costul", Toast.LENGTH_SHORT).show();
+        if (mileageText.isEmpty() || costText.isEmpty()) {
+            Toast.makeText(this, "Completează numărul de kilometri și costul", Toast.LENGTH_SHORT).show();
             return;
         }
 

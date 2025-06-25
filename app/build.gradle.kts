@@ -54,6 +54,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.inappmessaging)
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.language.id.common)
+    implementation(libs.translate)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -78,5 +80,7 @@ dependencies {
     implementation (libs.androidx.work.runtime)
     implementation (libs.androidx.work.runtime.v290)
     implementation (libs.androidx.swiperefreshlayout)
+    implementation (libs.mpandroidchart)
+    implementation (libs.androidx.percentlayout)
 
 }

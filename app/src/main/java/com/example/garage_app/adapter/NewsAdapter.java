@@ -40,14 +40,12 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         holder.title.setText(article.getTitle());
         holder.description.setText(article.getDescription());
 
-        // Încarcă imaginea cu Glide
         Glide.with(holder.itemView.getContext())
                 .load(article.getUrlToImage())
-                .placeholder(R.drawable.ic_launcher_foreground) // Imagine default dacă e null
-                .error(R.drawable.ic_launcher_foreground)             // Imagine pentru eroare
+                .placeholder(R.drawable.ic_image_placeholder)
+                .error(R.drawable.ic_image_placeholder)
                 .into(holder.image);
 
-        // Click listener pe întregul item
         holder.readMoreButton.setOnClickListener(v -> listener.onItemClick(article));
     }
 

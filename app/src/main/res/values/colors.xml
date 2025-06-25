@@ -13,8 +13,10 @@
     <color name="red">#FFD32F2F</color>
     <color name="blue">#FF2196F3</color>
     <color name="colorPrimary">#213448</color>
+    <color name="colorPrimaryDark">#182635</color>
     <color name="colorPrimaryVariant">#547792</color>
     <color name="colorSecondary">#94B4C1</color>
+    <color name="colorSecondaryLight">#A6C1CA</color>
     <color name="colorSecondaryVariant">#94B4C1</color>
     <color name="colorBackground">#547792</color>
     <color name="colorSurface">#547792</color>
@@ -25,4 +27,17 @@
     <color name="colorBackgroundCard">#39566D</color>
     <color name="colorTextCardPrimary">#FFFFFF</color>
     <color name="colorTextCardSecondary">#ECEFCA</color>
+    <color name="colorErrorContainer">#FFEF9A9A</color>
+    <color name="colorOnErrorContainer">#B00020</color>
+    <color name="colorSurfaceVariant">#6B8BA3</color>
+    <color name="colorOnSurfaceVariant">#CCCCCC</color>
+    <color name="colorOutline">#707A84</color>
+
+    <array name="chart_colors">
+        <item>@android:color/holo_blue_light</item>
+        <item>@android:color/holo_red_light</item>
+        <item>@android:color/holo_green_light</item>
+        <item>@android:color/holo_orange_light</item>
+        <item>@android:color/holo_purple</item>
+    </array>
 </resources>

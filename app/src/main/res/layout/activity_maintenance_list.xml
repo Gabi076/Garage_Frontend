@@ -1,60 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="12dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:padding="12dp">
 
+    <!-- Filter buttons at top -->
+    <HorizontalScrollView
+        android:id="@+id/type_filter_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/type_filter_container"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="8dp" />
+    </HorizontalScrollView>
+
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/maintenance_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/import_export_buttons" />
+        android:layout_above="@+id/bottom_buttons_container"
+        android:layout_below="@id/type_filter_scroll"
+        android:clipToPadding="false"
+        android:paddingBottom="72dp" />
 
+    <!-- Empty state text -->
+    <TextView
+        android:id="@+id/no_maintenances_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/bottom_buttons_container"
+        android:layout_below="@id/type_filter_scroll"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:text="Nu s-a găsit nicio fișă de service"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <!-- Floating menu container (overlay) -->
+    <FrameLayout
+        android:id="@+id/menu_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_above="@id/bottom_buttons_container">
+
+        <!-- Hidden buttons container -->
+        <LinearLayout
+            android:id="@+id/extra_buttons_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
+            android:visibility="invisible"
+            android:background="@drawable/menu_background"
+            android:elevation="12dp"
+            android:padding="8dp"
+            android:layout_gravity="start|bottom">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_stats"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="Statistici"
+                android:textColor="?attr/colorOnSurface"
+                app:icon="@drawable/ic_stats"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconSize="20dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_import_csv"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="Import"
+                android:textColor="?attr/colorOnSurface"
+                app:icon="@drawable/ic_import"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconSize="20dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_export_csv"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="Export"
+                android:textColor="?attr/colorOnSurface"
+                app:icon="@drawable/ic_export"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconSize="20dp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Bottom container for FABs -->
     <LinearLayout
-        android:id="@+id/import_export_buttons"
+        android:id="@+id/bottom_buttons_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="8dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:gravity="center_vertical">
+        android:orientation="horizontal"
+        android:padding="16dp">
 
-        <!-- Buton Export -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_export_csv"
-            style="@style/Widget.MaterialComponents.Button"
+        <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:text="Export"
-            android:textAllCaps="false"/>
+            android:layout_weight="1" />
 
-        <!-- Buton Import -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_import_csv"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:text="Import"
-            android:textAllCaps="false"/>
+        <!-- FABs container -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <!-- Buton Adăugare (doar iconiță) -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_add_maintenance"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="48dp"
-            android:layout_height="wrap_content"
-            app:cornerRadius="15dp"
-            app:icon="@android:drawable/ic_input_add"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconTint="@color/white"/>
+            <!-- Menu toggle FAB (left/start aligned) -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btn_toggle_menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_menu"
+                app:backgroundTint="@color/colorSecondary"
+                app:tint="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <!-- Add button FAB (right/end aligned) -->
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btn_add_maintenance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:src="@android:drawable/ic_input_add"
+                app:backgroundTint="@color/colorPrimary"
+                app:tint="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
-
 </RelativeLayout>

@@ -1,12 +1,17 @@
 package com.example.garage_app.ui.fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,10 +27,10 @@ import com.example.garage_app.model.Car;
 import com.example.garage_app.repository.CarRepository;
 import com.example.garage_app.repository.UserRepository;
 import com.example.garage_app.ui.AddCarActivity;
+import com.example.garage_app.ui.LoginActivity;
 import com.example.garage_app.ui.MaintenanceListActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +41,10 @@ import retrofit2.Response;
 
 public class CarListFragment extends Fragment {
     private ViewPager2 viewPager;
-    private TextView noCarsText;
+    MaterialButton addCarButton;
+    private TextView noCarsText, noConnectionText;
     private CarPagerAdapter adapter;
+    private String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
     private List<Car> carList = new ArrayList<>();
 
     @Nullable
@@ -45,10 +52,14 @@ public class CarListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        if (!isNetworkAvailable()) {
+            logOut();
+        }
         View view = inflater.inflate(R.layout.fragment_car_list, container, false);
-        MaterialButton addCarButton = view.findViewById(R.id.add_car_fab);
+        addCarButton = view.findViewById(R.id.add_car_fab);
         viewPager = view.findViewById(R.id.car_view_pager);
         noCarsText = view.findViewById(R.id.no_cars_text);
+        noConnectionText = view.findViewById(R.id.no_connection_text);
 
         adapter = new CarPagerAdapter(carList, getContext(), new CarPagerAdapter.OnCarActionListener() {
             @Override
@@ -90,6 +101,7 @@ public class CarListFragment extends Fragment {
         viewPager.setOffscreenPageLimit(3);
         viewPager.setClipToPadding(false);
         viewPager.setClipChildren(false);
+        noConnectionText.setVisibility(View.VISIBLE);
 
         CompositePageTransformer transformer = new CompositePageTransformer();
         transformer.addTransformer(new MarginPageTransformer(40)); // spațiu între carduri
@@ -100,10 +112,9 @@ public class CarListFragment extends Fragment {
         });
 
         viewPager.setPageTransformer(transformer);
-
-
         viewPager.setAdapter(adapter);
 
+        addCarButton.setVisibility(View.GONE);
         addCarButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AddCarActivity.class);
             startActivity(intent);
@@ -120,16 +131,19 @@ public class CarListFragment extends Fragment {
     }
 
     private void loadCarsForUser() {
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (firebaseUser == null) return;
+        if (userEmail == null) {
+            logOut();
+            return;
+        }
 
-        String email = firebaseUser.getEmail();
-        UserRepository.getUserIdByEmail(email, userId -> {
+        UserRepository.getUserIdByEmail(userEmail, userId -> {
             if (userId != null) {
                 CarRepository.getCarsByUser(Long.valueOf(userId), new Callback<>() {
                     @Override
                     public void onResponse(Call<List<Car>> call, Response<List<Car>> response) {
                         if (response.isSuccessful() && response.body() != null) {
+                            noConnectionText.setVisibility(View.GONE);
+                            addCarButton.setVisibility(View.VISIBLE);
                             carList.clear();
                             carList.addAll(response.body());
                             adapter.notifyDataSetChanged();
@@ -146,13 +160,33 @@ public class CarListFragment extends Fragment {
 
                     @Override
                     public void onFailure(Call<List<Car>> call, Throwable t) {
-                        Log.e("CarList", "Eroare la încărcarea mașinilor", t);
+                        Log.d("CarList", "Eroare la încărcarea mașinilor", t);
+                        Toast.makeText(getContext(), "Eroare la încărcarea mașinilor", Toast.LENGTH_LONG).show();
                         noCarsText.setVisibility(View.VISIBLE);
                         viewPager.setVisibility(View.GONE);
                     }
                 });
             }
         });
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        }
+        return false;
+    }
+
+    private void logOut() {
+        FirebaseAuth.getInstance().signOut();
+        SharedPreferences prefs = requireActivity().getSharedPreferences("auth", getContext().MODE_PRIVATE);
+        prefs.edit().putBoolean("is_logged_in", false).apply();
+        Toast.makeText(getContext(), "Oops! A apărut o eroare.", Toast.LENGTH_LONG).show();
+        startActivity(new Intent(getActivity(), LoginActivity.class));
+        requireActivity().finish();
     }
 }
 

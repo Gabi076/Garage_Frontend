@@ -41,7 +41,7 @@
             android:id="@+id/read_more_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Read More"
+            android:text="Citește mai mult"
             android:layout_marginTop="8dp"
             android:backgroundTint="#213448"
             android:textColor="#FFFFFF"

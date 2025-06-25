@@ -49,6 +49,10 @@
             android:name=".ui.AddMaintenanceActivity"
             android:theme="@style/Theme.GarageApp"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.MaintenanceStatsActivity"
+            android:theme="@style/Theme.GarageApp"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
